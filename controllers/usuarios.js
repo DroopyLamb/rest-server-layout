@@ -72,12 +72,16 @@ const usuariosDelete = async(req, res = response) => {
 
     const { id } = req.params;
 
+    // Obtener el uid que le enviamos a través del middleware validar-jwt
+    const uid = req.uid;
+
     // Borrado físico de la base de datos
     //const usuario = await Usuario.findByIdAndDelete(id);
 
     // Cambiar su estado a false
-
     const usuario = await Usuario.findByIdAndUpdate(id, { estado: false });
+
+    const usuarioAutenticado = req.usuario;
 
     res.json({
         msg: "Usuario borrado exitosamente",
