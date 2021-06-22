@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id" content="707349178521-bhk7j52e2n3498n40qln8hc8b0ra8sdo.apps.googleusercontent.com">
+    <title>Google SingIn</title>
+</head>
+
+<body>
+
+    <h1>Google Sigin</h1>
+    <hr>
+
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    <a href="#" onclick="signOut();">Sign out</a>
+
+
+    <script>
+        // Averiguar si estamos en producción o en desarrollo
+        var url = (window.location.hostname.includes('localhost')) ?
+            'http://localhost:8080/api/auth/google' :
+            'https://rest-server-layout.herokuapp.com/api/auth/google';
+
+
+        function onSignIn(googleUser) {
+            var profile = googleUser.getBasicProfile();
+            console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+            console.log('Name: ' + profile.getName());
+            console.log('Image URL: ' + profile.getImageUrl());
+            console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+            // Capturamos token
+            var id_token = googleUser.getAuthResponse().id_token;
+
+            // Creación de JSON con información que se enviará al backend
+            const data = {
+                id_token
+            };
+
+            fetch(url, {
+                    method: 'POST',
+                    headers: { // Esperamos que el contenido sea tipo JSON
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data) // Serealización de la información
+                })
+                .then(resp => resp.json()) // Respuesta del backend
+                .then(data => console.log('Nuestro Server', data)) // Impresión respuesta del servidor
+                .catch(console.log); // Impresión error
+        }
+
+        function signOut() {
+            var auth2 = gapi.auth2.getAuthInstance();
+            auth2.signOut().then(function() {
+                console.log('User signed out.');
+            });
+        }
+    </script>
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+</body>
+
+</html>
